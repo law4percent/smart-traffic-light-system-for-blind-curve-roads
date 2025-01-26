@@ -1,6 +1,5 @@
 venv
 src/inference/videos/*
-src/inference/images/*
 stls_lib/pc/__pycache__
 stls_lib/rp/__pycache__
 stls_lib/__pycache__
