@@ -147,14 +147,17 @@ def extract_data(file_path: str):
             key = key.strip()
             value = value.strip()
             
-            # Try to convert to float or int if possible
-            if value.replace('.', '', 1).isdigit() and value.count('.') < 2:
-                if '.' in value:
-                    get_data[key] = float(value)  # Convert to float
-                else:
-                    get_data[key] = int(value)  # Convert to int
-            else:
+            if key == "mqtt_broker":
                 get_data[key] = value
+            else:
+                # Try to convert to float or int if possible
+                if value.replace('.', '', 1).isdigit() and value.count('.') < 2:
+                    if '.' in value:
+                        get_data[key] = float(value)  # Convert to float
+                    else:
+                        get_data[key] = int(value)  # Convert to int
+                else:
+                    get_data[key] = value
     
     return get_data
     
