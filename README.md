@@ -22,7 +22,7 @@ Ensure you have the following dependencies installed:
 
 You can install them by running:
 
-```bash
+``bash
 pip install -r requirements.txt
 
 
