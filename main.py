@@ -12,6 +12,7 @@ if __name__ == "__main__":
                     frame_height = data["frame_height"],
                     frame_width = data["frame_width"],
                 )
+            exit()
 
         from stls_lib.rp import rp
         rp.main(
@@ -24,7 +25,9 @@ if __name__ == "__main__":
                 frame_height = data["frame_height"],
                 frame_width = data["frame_width"],
                 wait_key = data["wait_key"],
-                ord_key = data["ord_key"]
+                ord_key = data["ord_key"],
+                mqtt_broker=data["mqtt_broker"],
+                mqtt_port=data["mqtt_port"]
             )
         
     elif data["device"].lower() == "pc":
@@ -36,6 +39,7 @@ if __name__ == "__main__":
                     frame_height = data["frame_height"],
                     frame_width = data["frame_width"],
                 )
+            exit()
 
         from stls_lib.pc import pc
         pc.main(
