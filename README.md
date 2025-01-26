@@ -11,19 +11,6 @@ The system is programmed to detect vehicles in both directions:
 
 This dynamic control system improves traffic flow and safety, especially in areas with limited visibility or blind spots due to road curves.
 
-## Installation and Setup
-
-### Requirements
-
-Ensure you have the following dependencies installed:
-
-- ultralytics
-- picamera2
-
-You can install them by running:
-
-``bash
-pip install -r requirements.txt
 
 
 ## Configuration Parameters
@@ -99,10 +86,11 @@ The key to exit the program. The default key is **`q`**. If you wish to change i
 
 
 
-## Running the Program
+## Installation and Running the Program
 
 After configuring the `root_data.txt` file with your desired settings, you can run the program by executing the following command:
 
 ```bash
-python main.py
+pip install -r requirements.txt # To install all the requirements and dependencies
 
+python main.py                  # To run the program
