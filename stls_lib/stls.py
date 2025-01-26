@@ -42,10 +42,12 @@ def display_zone_info(frame, number_of_zones, zones_list, frame_name, queuing_da
         return
     
     for zone_indx in range(number_of_zones):
+        vehic = queuing_data[zone_indx]["vehicle"]
+        curr_time = queuing_data[zone_indx]["current_time"]
         cv2.putText(
                     frame,
-                    f"zone: {zone_indx} | nv: {len(zones_list[zone_indx])} | pv: {queuing_data[zone_indx]["vehicle"]} ["
-                    f"{queuing_data[zone_indx]["current_time"]}]",
+                    f"zone: {zone_indx} | nv: {len(zones_list[zone_indx])} | pv: {vehic} ["
+                    f"{curr_time}]",
                     (25, 25 + 28 * zone_indx),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.75,
