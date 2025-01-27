@@ -2,6 +2,7 @@ import cv2
 from stls_lib import stls
 import time
 from picamera2 import Picamera2
+import paho.mqtt
 import paho.mqtt.client as mqtt
 
 
@@ -37,7 +38,12 @@ def main(weight_file_path: str,
     zones, number_of_zones = stls.load_zones(zones_file_path)
 
     topic_esp = ["esp32/one", "esp32/two"]
-    client = mqtt.Client("RaspberryPi")
+
+    if paho.mqtt.__version__[0] > '1':
+        client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1, "RaspberryPi")
+    else:
+        client = mqtt.Client("RaspberryPi")
+        
     client.connect(mqtt_broker, mqtt_port)
     client.on_publish = on_publish
     client.loop_start()  # Start the MQTT loop for handling background tasks
