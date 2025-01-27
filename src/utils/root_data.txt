@@ -1,5 +1,5 @@
-device: rp
-write_points_mode: True
+device: pc
+write_points_mode: False
 detect_sensitivity: 0.15
 frame_name: Smart Traffic System
 frame_height: 800 
@@ -7,6 +7,11 @@ frame_width: 1280
 time_interval: 3.0
 
 video_source: src/inference/videos/video.mp4
+
+communication_protocol: BLE
+
+SERVICE_UUID: 12345678-1234-5678-1234-56789abcdef0
+CHARACTERISTIC_UUID: 87654321-1234-5678-1234-56789abcdef0
 
 mqtt_broker: 192.168.1.100
 mqtt_port: 1883

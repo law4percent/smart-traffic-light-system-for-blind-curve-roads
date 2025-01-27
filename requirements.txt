@@ -1,3 +1,4 @@
 ultralytics
 picamera2
 paho-mqtt
+bleak

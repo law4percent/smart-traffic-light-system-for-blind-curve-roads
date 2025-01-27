@@ -1,5 +1,5 @@
 from stls_lib import stls
-
+import asyncio
 
 if __name__ == "__main__":
     data = stls.extract_data(file_path="src/utils/root_data.txt")
@@ -14,22 +14,40 @@ if __name__ == "__main__":
                     ord_key = data["ord_key"],
                 )
             exit()
+        else:
+            print("Invalid input found at data[\"write_points_mode\"]. Input must be between True and False.")
 
-        from stls_lib.rp import rp_video_process
-        rp_video_process.main(
-                weight_file_path = data["weight_file_path"],
-                class_list_file_path = data["class_list_file_path"],
-                zones_file_path = data["zones_file_path"],
-                detect_sensitivity = data["detect_sensitivity"],
-                frame_name = data["frame_name"],
-                time_interval = data["time_interval"],
-                frame_height = data["frame_height"],
-                frame_width = data["frame_width"],
-                wait_key = data["wait_key"],
-                ord_key = data["ord_key"],
-                mqtt_broker=data["mqtt_broker"],
-                mqtt_port=data["mqtt_port"]
-            )
+
+        if data["communication_protocol"].lower() == "mqtt":
+            from stls_lib.rp import rp_process_video_MQTT
+            rp_process_video_MQTT.main(
+                    weight_file_path = data["weight_file_path"],
+                    class_list_file_path = data["class_list_file_path"],
+                    zones_file_path = data["zones_file_path"],
+                    detect_sensitivity = data["detect_sensitivity"],
+                    frame_name = data["frame_name"],
+                    time_interval = data["time_interval"],
+                    frame_height = data["frame_height"],
+                    frame_width = data["frame_width"],
+                    wait_key = data["wait_key"],
+                    ord_key = data["ord_key"],
+                    mqtt_broker=data["mqtt_broker"],
+                    mqtt_port=data["mqtt_port"]
+                )
+        elif data["communication_protocol"].lower() == "ble":
+            from stls_lib.rp import rp_process_video_BLE
+            asyncio.run(rp_process_video_BLE.main(weight_file_path = data["weight_file_path"],
+                    class_list_file_path = data["class_list_file_path"],
+                    zones_file_path = data["zones_file_path"],
+                    detect_sensitivity = data["detect_sensitivity"],
+                    frame_name = data["frame_name"],
+                    time_interval = data["time_interval"],
+                    frame_height = data["frame_height"],
+                    frame_width = data["frame_width"],
+                    wait_key = data["wait_key"],
+                    ord_key = data["ord_key"]))
+        else:
+            print("Invalid input found at data[\"communication_protocol\"]. Input must be between ble and mqtt.")
         
     elif data["device"].lower() == "pc":
         if data["write_points_mode"].lower() == "true":
@@ -42,6 +60,8 @@ if __name__ == "__main__":
                     ord_key = data["ord_key"],
                 )
             exit()
+        else:
+            print("Invalid input found at data[\"write_points_mode\"]. Input must be between True and False.")
 
         from stls_lib.pc import pc_video_process
         pc_video_process.main(
@@ -59,4 +79,4 @@ if __name__ == "__main__":
             )
     
     else:
-        print("Invalid input found data[\"device\"]. Input must be between pc or rp")
+        print("Invalid input found at data[\"device\"]. Input must be between pc and rp.")

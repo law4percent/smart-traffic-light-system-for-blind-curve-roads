@@ -13,6 +13,10 @@ def check_exist_file(file_path):
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"The file '{file_path}' does not exist.")
     
+def print_data(data):
+    print("check_params: ", end="")
+    for key, value in data.items():
+        print(f"{key}={value}", end=" ")
     
 def read_points_from_file(file_path):
     check_exist_file(file_path)
@@ -147,7 +151,7 @@ def extract_data(file_path: str):
             key = key.strip()
             value = value.strip()
             
-            if key == "mqtt_broker":
+            if key == "mqtt_broker" or key == "SERVICE_UUID" or key == "CHARACTERISTIC_UUID":
                 get_data[key] = value
             else:
                 # Try to convert to float or int if possible
@@ -158,7 +162,8 @@ def extract_data(file_path: str):
                         get_data[key] = int(value)  # Convert to int
                 else:
                     get_data[key] = value
-    
+
+    print_data(get_data)
     return get_data
     
 
