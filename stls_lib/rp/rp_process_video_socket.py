@@ -35,8 +35,8 @@ def main(weight_file_path: str,
     
     # ESP32 device configurations
     esp32_devices = [
-        {"name": esp32_ip[0], "ip": "192.168.1.200", "port": esp32_port[0]},
-        {"name": esp32_ip[1], "ip": "192.168.1.201", "port": esp32_port[1]}
+        {"name": "ESP32_1", "ip": esp32_ip[0], "port": esp32_port[0]},
+        {"name": "ESP32_2", "ip": esp32_ip[1], "port": esp32_port[1]}
     ]
 
     # Initialize camera
@@ -82,7 +82,7 @@ def main(weight_file_path: str,
                         indx, zones_list, current_time, frame, 
                         zones_data, time_interval))
                 
-                # Send data via WiFi
+                # Send data via WiFi to ESP32
                 curr_time = queuing_data[indx]["current_time"]
                 curr_vehic = queuing_data[indx]["vehicle"]
                 if curr_time != 0.0 and previous_vehicle[indx] != curr_vehic:
@@ -94,7 +94,7 @@ def main(weight_file_path: str,
                             previous_vehicle[indx] = curr_vehic
                             print(f"Vehicle data sent to {device['name']}")
                         else:
-                            print(f"Vehicle data sent to {device['name']} was failed.")
+                            print(f"Failed to send data to {device['name']}.")
 
             stls.display_zone_info(frame, number_of_zones, zones_list, frame_name, queuing_data)
             success = stls.show_frame(frame, frame_name, wait_key, ord_key)
