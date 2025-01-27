@@ -10,6 +10,26 @@ def on_publish(client, userdata, mid):
     print("message published")
 
 
+def safe_publish(client, topic, message, qos=0):
+    # Check if the client is connected
+    if not client.is_connected():
+        print("Client is not connected. Attempting to reconnect...")
+        try:
+            client.reconnect()
+            print("Reconnected successfully.")
+        except Exception as e:
+            print(f"Error reconnecting: {e}")
+            return  # Exit if reconnection fails
+    
+    try:
+        # Publish message
+        pubMsg = client.publish(topic, message.encode('utf-8'), qos=qos)
+        pubMsg.wait_for_publish()  # Wait for the publish to complete
+        print("Message published successfully.")
+    except Exception as e:
+        print(f"Message publish failed: {e}")
+
+
 def main(weight_file_path: str,
          class_list_file_path: str,
          zones_file_path: str,
@@ -20,8 +40,8 @@ def main(weight_file_path: str,
          frame_width: int,
          wait_key: int,
          ord_key: str,
-         mqtt_broker : str, # "192.168.1.100" Replace with Raspberry Pi's static IP
-         mqtt_port: int # 1883 default port
+         mqtt_broker: str,  # "192.168.1.100" Replace with Raspberry Pi's static IP
+         mqtt_port: int  # 1883 default port
          ):
     
     # Initialize camera
@@ -74,11 +94,12 @@ def main(weight_file_path: str,
             
             # Publish data
             curr_time = queuing_data[indx]["current_time"]
+
             curr_vehic = queuing_data[indx]["vehicle"]
             if curr_time != 0.0:
                 if previous_vehicle[indx] != curr_vehic:
-                    pubMsg = client.publish(topic_esp[indx], curr_vehic.encode('utf-8'), qos=0)
-                    pubMsg.wait_for_publish()
+                    # Use safe_publish to ensure client is connected before publishing
+                    safe_publish(client, topic_esp[indx], curr_vehic, qos=0)
                     previous_vehicle[indx] = curr_vehic
 
         stls.display_zone_info(frame, number_of_zones, zones_list, frame_name, queuing_data)  # Optional
