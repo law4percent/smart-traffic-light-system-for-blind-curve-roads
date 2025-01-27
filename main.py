@@ -11,15 +11,16 @@ if __name__ == "__main__":
                     save_path = data["zones_file_path"],
                     frame_height = data["frame_height"],
                     frame_width = data["frame_width"],
+                    ord_key = data["ord_key"],
                 )
             exit()
 
-        from stls_lib.rp import rp
-        rp.main(
+        from stls_lib.rp import rp_video_process
+        rp_video_process.main(
                 weight_file_path = data["weight_file_path"],
                 class_list_file_path = data["class_list_file_path"],
                 zones_file_path = data["zones_file_path"],
-                detect_sensivity = data["detect_sensivity"],
+                detect_sensitivity = data["detect_sensitivity"],
                 frame_name = data["frame_name"],
                 time_interval = data["time_interval"],
                 frame_height = data["frame_height"],
@@ -38,16 +39,17 @@ if __name__ == "__main__":
                     save_path = data["zones_file_path"],
                     frame_height = data["frame_height"],
                     frame_width = data["frame_width"],
+                    ord_key = data["ord_key"],
                 )
             exit()
 
-        from stls_lib.pc import pc
-        pc.main(
+        from stls_lib.pc import pc_video_process
+        pc_video_process.main(
                 video_source = data["video_source"],
                 weight_file_path = data["weight_file_path"],
                 class_list_file_path = data["class_list_file_path"],
                 zones_file_path = data["zones_file_path"],
-                detect_sensivity = data["detect_sensivity"],
+                detect_sensitivity = data["detect_sensitivity"],
                 frame_name = data["frame_name"],
                 time_interval = data["time_interval"],
                 frame_height = data["frame_height"],
