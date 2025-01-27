@@ -3,7 +3,6 @@ from stls_lib import stls
 import time
 from picamera2 import Picamera2
 import socket
-import json
 
 def send_data_to_esp32(ip, port, data):
     try:
@@ -11,8 +10,8 @@ def send_data_to_esp32(ip, port, data):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Connect to ESP32
         sock.connect((ip, port))
-        # Send data
-        sock.send(json.dumps(data).encode())
+        # Send data as string (no JSON encoding)
+        sock.send(data.encode())
         # Close socket
         sock.close()
         print(f"Data sent successfully to {ip}")
