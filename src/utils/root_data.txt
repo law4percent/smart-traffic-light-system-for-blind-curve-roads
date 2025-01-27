@@ -8,7 +8,12 @@ time_interval: 3.0
 
 video_source: src/inference/videos/video.mp4
 
-communication_protocol: BLE
+communication_protocol: socket
+
+IP_ESP32_1: 192.168.1.200
+ESP32_port_1: 80
+IP_ESP32_2: 192.168.1.201
+ESP32_port_2: 80
 
 SERVICE_UUID: 12345678-1234-5678-1234-56789abcdef0
 CHARACTERISTIC_UUID: 87654321-1234-5678-1234-56789abcdef0

@@ -151,7 +151,7 @@ def extract_data(file_path: str):
             key = key.strip()
             value = value.strip()
             
-            if key == "mqtt_broker" or key == "SERVICE_UUID" or key == "CHARACTERISTIC_UUID":
+            if key == "mqtt_broker" or key == "SERVICE_UUID" or key == "CHARACTERISTIC_UUID" or key == "IP_ESP32_1" or key == "IP_ESP32_2":
                 get_data[key] = value
             else:
                 # Try to convert to float or int if possible
