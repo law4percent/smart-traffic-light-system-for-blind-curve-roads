@@ -15,8 +15,13 @@ def redraw_frame(points, image, frame_name):
     temp_image = image.copy()
     if len(points) > 1:
         cv2.polylines(temp_image, [np.array(points)], isClosed=False, color=(0, 255, 0), thickness=2)
+        instruction(temp_image)
+        
     for point in points:
         cv2.circle(temp_image, point, 5, (0, 0, 255), -1)
+        instruction(temp_image)
+
+    instruction(temp_image)
     cv2.imshow(frame_name, temp_image)
 
 def save_points_to_file(file_path):
@@ -28,7 +33,12 @@ def save_points_to_file(file_path):
     points = []
     entry_counter += 1
 
-def main(video_source, save_path, frame_height, frame_width):
+def instruction(frame):
+    cv2.rectangle(frame, (20, 10), (730, 65), (255, 255, 255), -1)
+    cv2.putText(frame, f"Left click to select points.", (25, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+    cv2.putText(frame, f"Press 's' to save, 'c' to close the polygon, and 'q' to quit.", (25, 30 + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+    
+def main(video_source, save_path, frame_height, frame_width, ord_key):
     global points, frame_copy, frame_name
 
     cap = stls.load_camera(video_source)
@@ -44,6 +54,8 @@ def main(video_source, save_path, frame_height, frame_width):
         frame = cv2.resize(frame, (frame_width, frame_height))
         frame_copy = frame.copy()
 
+        instruction(frame)
+        
         cv2.imshow(frame_name, frame)
         cv2.setMouseCallback(frame_name, click_event)
 
@@ -65,7 +77,7 @@ def main(video_source, save_path, frame_height, frame_width):
                 points = []
                 frame_idx += 1
                 break
-            elif key == ord('q'):  # Quit
+            elif key == ord(ord_key):  # Quit
                 cap.release()
                 cv2.destroyAllWindows()
                 return
