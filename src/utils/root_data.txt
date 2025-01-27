@@ -1,6 +1,6 @@
-device: pc
+device: rp
 write_points_mode: True
-detect_sensivity: 0.15
+detect_sensitivity: 0.15
 frame_name: Smart Traffic System
 frame_height: 800 
 frame_width: 1280
