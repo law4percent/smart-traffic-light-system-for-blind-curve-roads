@@ -14,8 +14,8 @@ if __name__ == "__main__":
                     ord_key = data["ord_key"],
                 )
             exit()
-        else:
-            print("Invalid input found at data[\"write_points_mode\"]. Input must be between True and False.")
+        elif data["write_points_mode"].lower() != "false":
+            print("\nInvalid input found at data[\"write_points_mode\"]. Input must be between True and False.")
 
 
         if data["communication_protocol"].lower() == "mqtt":
@@ -47,7 +47,7 @@ if __name__ == "__main__":
                     wait_key = data["wait_key"],
                     ord_key = data["ord_key"]))
         else:
-            print("Invalid input found at data[\"communication_protocol\"]. Input must be between ble and mqtt.")
+            print("\nInvalid input found at data[\"communication_protocol\"]. Input must be between ble and mqtt.")
         
     elif data["device"].lower() == "pc":
         if data["write_points_mode"].lower() == "true":
@@ -60,8 +60,8 @@ if __name__ == "__main__":
                     ord_key = data["ord_key"],
                 )
             exit()
-        else:
-            print("Invalid input found at data[\"write_points_mode\"]. Input must be between True and False.")
+        elif data["write_points_mode"].lower() != "false":
+            print("\nInvalid input found at data[\"write_points_mode\"]. Input must be between True and False.")
 
         from stls_lib.pc import pc_video_process
         pc_video_process.main(
@@ -79,4 +79,4 @@ if __name__ == "__main__":
             )
     
     else:
-        print("Invalid input found at data[\"device\"]. Input must be between pc and rp.")
+        print("\nInvalid input found at data[\"device\"]. Input must be between pc and rp.")
