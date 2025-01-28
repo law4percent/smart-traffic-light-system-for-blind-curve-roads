@@ -1,13 +1,12 @@
-device: pc
+device: rp
 write_points_mode: False
+max_zones: 2
 detect_sensitivity: 0.15
 frame_name: Smart Traffic System
 frame_height: 800 
 frame_width: 1280
 time_interval: 3.0
-
 video_source: src/inference/videos/video.mp4
-
 communication_protocol: socket
 
 IP_ESP32_1: 192.168.1.200

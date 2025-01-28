@@ -12,6 +12,7 @@ if __name__ == "__main__":
                     frame_height = data["frame_height"],
                     frame_width = data["frame_width"],
                     ord_key = data["ord_key"],
+                    max_zones = data["max_zones"]
                 )
             exit()
         elif data["write_points_mode"].lower() != "false":
@@ -76,6 +77,7 @@ if __name__ == "__main__":
                     frame_height = data["frame_height"],
                     frame_width = data["frame_width"],
                     ord_key = data["ord_key"],
+                    max_zones = data["max_zones"]
                 )
             exit()
         elif data["write_points_mode"].lower() != "false":
