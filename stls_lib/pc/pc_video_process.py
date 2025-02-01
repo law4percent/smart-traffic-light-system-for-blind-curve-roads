@@ -22,7 +22,8 @@ def main(video_source,
     count = 0
     success = True
     zones_data = [{"countdown_start_time": 0.0, "refresh": False, "get_vehicle": None} for _ in range(number_of_zones)]
-    
+    previous_vehicle = [None, None]
+
     while success:
         current_time = time.time()
         success, frame = captured.read()
@@ -43,6 +44,14 @@ def main(video_source,
         queuing_data = []
         for indx in range(number_of_zones):
             queuing_data.append(stls.handle_zone_queuing(indx, zones_list, current_time, frame, zones_data, time_interval))
+            
+            curr_time = queuing_data[indx]["current_time"]
+            curr_vehic = queuing_data[indx]["vehicle"]
+            if curr_time != 0.0:
+                if previous_vehicle[indx] != curr_vehic:
+                    previous_vehicle[indx] = curr_vehic
+            
+            stls.traffic_light(frame, indx, is_zone_occupied=len(zones_list[indx]) > 0, vehicle=curr_time) # Optional
 
         stls.display_zone_info(frame, number_of_zones, zones_list, frame_name, queuing_data) # Optional
         success = stls.show_frame(frame, frame_name, wait_key, ord_key) # Optional

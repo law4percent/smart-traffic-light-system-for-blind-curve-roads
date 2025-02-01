@@ -41,23 +41,31 @@ def draw_polylines_zones(image, data, frame_name, linesColor=(0, 255, 0), txtCol
         cv2.putText(image, f"{key}", tuple(centroid), cv2.FONT_HERSHEY_SIMPLEX, fontScale, txtColor, thickness)
         
 
-def display_zone_info(frame, number_of_zones, zones_list, frame_name, queuing_data, color=(255, 255, 255), fontScale=0.75, thickness=2):
+def display_zone_info(frame, number_of_zones, zones_list, frame_name, queuing_data, color=(255, 255, 255)):
     if frame_name.lower() == "off":
         return
+    
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_scale = 0.75
+    thickness = 2
+    bg_color = (0, 0, 0)
+    alpha = 0.6
+    
+    overlay = frame.copy()
     
     for zone_indx in range(number_of_zones):
         vehic = queuing_data[zone_indx]["vehicle"]
         curr_time = queuing_data[zone_indx]["current_time"]
-        cv2.putText(
-                    frame,
-                    f"zone: {zone_indx} | nv: {len(zones_list[zone_indx])} | pv: {vehic} ["
-                    f"{curr_time}]",
-                    (25, 25 + 28 * zone_indx),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.75,
-                    color,
-                    2,
-                )
+        text = f"Zone: {zone_indx} | NV: {len(zones_list[zone_indx])} | PV: {vehic} [{curr_time}]"
+        
+        position = (25, 25 + 30 * zone_indx)
+        (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
+        
+        cv2.rectangle(overlay, (position[0] - 5, position[1] - text_h - 5), 
+                      (position[0] + text_w + 5, position[1] + 5), bg_color, cv2.FILLED)
+        cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+        
+        cv2.putText(frame, text, position, font, font_scale, color, thickness)
 
 
 def check_camera(cap):
@@ -80,14 +88,17 @@ def track_objects_in_zones(frame, boxes, class_list, zones, zones_list, frame_na
                 break
     return zones_list
 
-
 def show_object_info(frame, x1, y1, x2, y2, cls, conf_score, class_list, cls_center_pnt, frame_name):
     if frame_name.lower() == "off":
         return
-    cv2.circle(img=frame, center=cls_center_pnt, radius=0, color=(255, 100, 255), thickness=5)
-    cv2.rectangle(img=frame, pt1=(x1, y1), pt2=(x2, y2), color=(255, 100, 100), thickness=2)
-    cv2.putText(img=frame, text=f"{class_list[int(cls)]} {conf_score}%", org=(x1, y1), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=0.75, color=(255, 255, 255), thickness=2)
-
+    colors = {'box': (86, 179, 255), 'text': (255, 255, 255), 'center': (255, 89, 94)}
+    overlay = frame.copy()
+    cv2.rectangle(overlay, (x1, y1), (x2, y2), colors['box'], cv2.FILLED)
+    cv2.addWeighted(overlay, 0.2, frame, 0.8, 0, frame)
+    cv2.rectangle(frame, (x1, y1), (x2, y2), colors['box'], 2)
+    cv2.circle(frame, cls_center_pnt, 4, colors['center'], -1)
+    text = f"{class_list[int(cls)]} {conf_score}%"
+    cv2.putText(frame, text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.6, colors['text'], 2)          
 
 def init_zone_list(number_of_zones):
     zones_list = []
@@ -170,7 +181,7 @@ def extract_data(file_path: str):
 def handle_zone_queuing(zone_index, zones_list, current_time, frame, zones_data, interval):
     zone = zones_data[zone_index]
 
-    # Start the countdown if refresh is False and the zone has vehicles
+    # Start the countdown if it's not already refreshing and the zone has vehicles
     if not zone["refresh"] and len(zones_list[zone_index]) > 0:
         zone["refresh"] = True
         zone["countdown_start_time"] = current_time
@@ -178,17 +189,60 @@ def handle_zone_queuing(zone_index, zones_list, current_time, frame, zones_data,
 
     # Check if the countdown is active and has elapsed
     if zone["refresh"] and zone["countdown_start_time"] != 0.0:
-        if current_time - zone["countdown_start_time"] >= interval:
+        elapsed_time = current_time - zone["countdown_start_time"]
+        if elapsed_time >= interval:
+            # Countdown is complete
             print(f"Countdown complete for Zone {zone_index}!")
             zone["refresh"] = False
             zone["countdown_start_time"] = 0.0
             zone["get_vehicle"] = None
 
-    # Display the zone's status
-    curr_time = '%.2f' % (current_time - zone['countdown_start_time']) if zone['countdown_start_time'] != 0.0 else 0.0
-    
+    # Calculate the current time remaining in the countdown
+    remaining_time = 0.0
+    if zone["countdown_start_time"] != 0.0:
+        remaining_time = round(current_time - zone['countdown_start_time'], 2)
+
     return {
-            "zone_index": zone_index,
-            "vehicle": zone["get_vehicle"],
-            "current_time": curr_time
-        }
+        "zone_index": zone_index,
+        "vehicle": zone["get_vehicle"],
+        "current_time": f'{remaining_time:.2f}'
+    }
+
+def traffic_light(frame, zone_index, is_zone_occupied, vehicle, rect_color=(100, 100, 100), thickness=4, radius=15):
+    # Get the frame dimensions
+    frame_width = frame.shape[1]
+    frame_height = frame.shape[0]
+
+    if zone_index == 0:
+        top_left = (int(0.05 * frame_width), int(frame_height - 150))
+        bottom_right = (top_left[0] + 50, top_left[1] + 100)
+    else:
+        top_left = (int(frame_width - 100), int(frame_height - 150))
+        bottom_right = (top_left[0] + 50, top_left[1] + 100)
+
+
+    # Calculate center of the rectangle and y positions for circles
+    rect_center_x = (top_left[0] + bottom_right[0]) // 2
+    upper_y = top_left[1] + radius + 5
+    lower_y = bottom_right[1] - radius - 5
+
+    # Mask color (background for rectangle)
+    mask_color = (0, 0, 0)
+
+    # Draw rectangle and mask
+    cv2.putText(frame, f"Zone: {zone_index}", (top_left[0], top_left[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (255, 255, 255), 2)
+    cv2.rectangle(frame, top_left, bottom_right, rect_color, thickness)
+    cv2.rectangle(frame, top_left, bottom_right, mask_color, -1)
+
+    # Determine the circle colors based on vehicle presence
+    if is_zone_occupied:
+        upper_circle_color = (0, 255, 255)
+        lower_circle_color = (0, 100, 0)
+    else:
+        upper_circle_color = (0, 100, 100)
+        lower_circle_color = (0, 255, 0)
+
+    # Draw the circles
+    cv2.circle(frame, (rect_center_x, upper_y), radius, upper_circle_color, -1)
+    cv2.circle(frame, (rect_center_x, lower_y), radius, lower_circle_color, -1)
+
