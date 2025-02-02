@@ -1,4 +1,3 @@
 ultralytics
 picamera2
-paho-mqtt
-bleak
+firebase-admin
