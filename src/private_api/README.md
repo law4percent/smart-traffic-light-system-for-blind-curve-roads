@@ -1,0 +1,1 @@
+Generate new service account key to your Firebase real-time database.

@@ -3,3 +3,5 @@ src/inference/videos/*
 stls_lib/pc/__pycache__
 stls_lib/rp/__pycache__
 stls_lib/__pycache__
+src/private_api/serviceAccountKey.json
+test
