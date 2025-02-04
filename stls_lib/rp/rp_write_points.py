@@ -31,8 +31,17 @@ def save_points_to_file(file_path, max_zones):
         return False
         
     with open(file_path, "a") as file:
+        if entry_counter == 0:  # Only write the header when the first zone is saved
+            file.write("zones: \n")
+        
         formatted_points = ', '.join([f"({x}, {y})" for x, y in points])
-        file.write(f"{entry_counter}: [{formatted_points}]\n")
+        file.write(f"   {entry_counter}: [{formatted_points}]\n")
+        
+        if entry_counter == max_zones - 1:  # When the last zone is saved, write the footer
+            file.write(f"\nnumber_of_zone: {entry_counter + 1}\n")
+            file.write(f"frame_width: 1280\n")
+            file.write(f"frame_height: 800\n")
+    
     print(f"Entry {entry_counter} saved to '{file_path}'.")
     points = []
     entry_counter += 1
@@ -41,7 +50,7 @@ def save_points_to_file(file_path, max_zones):
 def instruction(frame):
     cv2.rectangle(frame, (20, 10), (730, 65), (255, 255, 255), -1)
     cv2.putText(frame, f"Left click to select points.", (25, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
-    cv2.putText(frame, f"Press 's' to save, 'c' to close the polygon, and 'q' to quit.", (25, 30 + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
+    cv2.putText(frame, f"Press 's' to save, 'c' to close the polygon, 'u' to undo last point, and 'q' to quit.", (25, 30 + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
 
 def main(save_path, frame_height, frame_width, ord_key, max_zones):
     global points, frame_copy, frame_name
@@ -67,7 +76,7 @@ def main(save_path, frame_height, frame_width, ord_key, max_zones):
         cv2.imshow(frame_name, frame)
         cv2.setMouseCallback(frame_name, click_event)
         
-        print(f"Frame {frame_idx}: Left click to select points. Press 's' to save, 'c' to close the polygon, and 'q' to quit.")
+        print(f"Frame {frame_idx}: Left click to select points. Press 's' to save, 'c' to close the polygon, 'u' to undo last point, and 'q' to quit.")
         print(f"Zones created: {entry_counter}/{max_zones}")
 
         while True:
@@ -90,6 +99,13 @@ def main(save_path, frame_height, frame_width, ord_key, max_zones):
                 points = []
                 frame_idx += 1
                 break
+            elif key == ord('u'):  # Undo last point
+                if points:
+                    points.pop()  # Remove the last point
+                    print(f"Undo last point. Remaining points: {len(points)}")
+                    redraw_frame(points, frame_copy, frame_name)
+                else:
+                    print("No points to undo.")
             elif key == ord(ord_key):  # Quit
                 picam2.stop()
                 cv2.destroyAllWindows()

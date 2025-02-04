@@ -1,89 +1,62 @@
 from stls_lib import stls
-import asyncio
 
-if __name__ == "__main__":
-    data = stls.extract_data(file_path="src/utils/root_data.txt")
+def handle_invalid_input(input_name, expected_values, value):
+    print(f"\nInvalid input found at {input_name}. Input must be one of {expected_values}. Found: {value}")
+    exit()
 
-    if data["device"].lower() == "rp":
-        if data["write_points_mode"].lower() == "true":
-            from stls_lib.rp import rp_write_points
-            rp_write_points.main(
-                    save_path = data["zones_file_path"],
-                    frame_height = data["frame_height"],
-                    frame_width = data["frame_width"],
-                    ord_key = data["ord_key"],
-                    max_zones = data["max_zones"]
-                )
-            exit()
-        elif data["write_points_mode"].lower() != "false":
-            print("\nInvalid input found at data[\"write_points_mode\"]. Input must be between True and False.")
+def process_rp_device(data):
+    """
+    Process the Raspberry Pi device logic.
+    """
+    from stls_lib.rp import rp_write_points, rp_process_video
+    
+    write_points_mode = data["write_points_mode"].lower()
+    if write_points_mode == "true":
+        rp_write_points.main(
+                save_path = data["zones_file_path"],
+                frame_height = data["frame_height"],
+                frame_width = data["frame_width"],
+                ord_key = data["ord_key"],
+                max_zones = data["max_zones"]
+            )
+        exit()  # Exit after completing write_points
 
+    elif write_points_mode == "false":
+        rp_process_video.main(
+                weight_file_path = data["weight_file_path"],
+                class_list_file_path = data["class_list_file_path"],
+                zones_file_path = data["zones_file_path"],
+                detect_sensitivity = data["detect_sensitivity"],
+                frame_name = data["frame_name"],
+                time_interval = data["time_interval"],
+                frame_height = data["frame_height"],
+                frame_width = data["frame_width"],
+                wait_key = data["wait_key"],
+                ord_key = data["ord_key"],
+                communication_protocol = data["communication_protocol"]
+            )
+    else:
+        handle_invalid_input("data[\"write_points_mode\"]", ["true", "false"], write_points_mode)
 
-        if data["communication_protocol"].lower() == "mqtt":
-            from stls_lib.rp import rp_process_video_MQTT
-            rp_process_video_MQTT.main(
-                    weight_file_path = data["weight_file_path"],
-                    class_list_file_path = data["class_list_file_path"],
-                    zones_file_path = data["zones_file_path"],
-                    detect_sensitivity = data["detect_sensitivity"],
-                    frame_name = data["frame_name"],
-                    time_interval = data["time_interval"],
-                    frame_height = data["frame_height"],
-                    frame_width = data["frame_width"],
-                    wait_key = data["wait_key"],
-                    ord_key = data["ord_key"],
-                    mqtt_broker=data["mqtt_broker"],
-                    mqtt_port=data["mqtt_port"]
-                )
-        elif data["communication_protocol"].lower() == "ble":
-            from stls_lib.rp import rp_process_video_BLE
-            asyncio.run(rp_process_video_BLE.main(
-                    weight_file_path = data["weight_file_path"],
-                    class_list_file_path = data["class_list_file_path"],
-                    zones_file_path = data["zones_file_path"],
-                    detect_sensitivity = data["detect_sensitivity"],
-                    frame_name = data["frame_name"],
-                    time_interval = data["time_interval"],
-                    frame_height = data["frame_height"],
-                    frame_width = data["frame_width"],
-                    wait_key = data["wait_key"],
-                    ord_key = data["ord_key"]
-                ))
-        elif data["communication_protocol"].lower() == "socket":
-            from stls_lib.rp import rp_process_video_socket
-            rp_process_video_socket.main(
-                    weight_file_path = data["weight_file_path"],
-                    class_list_file_path = data["class_list_file_path"],
-                    zones_file_path = data["zones_file_path"],
-                    detect_sensitivity = data["detect_sensitivity"],
-                    frame_name = data["frame_name"],
-                    time_interval = data["time_interval"],
-                    frame_height = data["frame_height"],
-                    frame_width = data["frame_width"],
-                    wait_key = data["wait_key"],
-                    ord_key = data["ord_key"],
-                    esp32_ip = [data["IP_ESP32_1"], data["IP_ESP32_2"]],
-                    esp32_port = [data["ESP32_port_1"], data["ESP32_port_2"]],
-                )
-        else:
-            print("\nInvalid input found at data[\"communication_protocol\"]. Input must be between socket, ble and mqtt.")
-        
-    elif data["device"].lower() == "pc":
-        if data["write_points_mode"].lower() == "true":
-            from stls_lib.pc import pc_write_points
-            pc_write_points.main(
-                    video_source = data["video_source"],
-                    save_path = data["zones_file_path"],
-                    frame_height = data["frame_height"],
-                    frame_width = data["frame_width"],
-                    ord_key = data["ord_key"],
-                    max_zones = data["max_zones"]
-                )
-            exit()
-        elif data["write_points_mode"].lower() != "false":
-            print("\nInvalid input found at data[\"write_points_mode\"]. Input must be between True and False.")
+def process_pc_device(data):
+    """
+    Process the PC device logic.
+    """
+    from stls_lib.pc import pc_write_points, pc_video_process
+    
+    write_points_mode = data["write_points_mode"].lower()
+    if write_points_mode == "true":
+        pc_write_points.main(
+                video_source = data["video_source"],
+                save_path = data["zones_file_path"],
+                frame_height = data["frame_height"],
+                frame_width = data["frame_width"],
+                ord_key = data["ord_key"],
+                max_zones = data["max_zones"]
+            )
+        exit()  # Exit after completing write_points
 
-        from stls_lib.pc import pc_video_process
+    elif write_points_mode == "false":
         pc_video_process.main(
                 video_source = data["video_source"],
                 weight_file_path = data["weight_file_path"],
@@ -95,8 +68,25 @@ if __name__ == "__main__":
                 frame_height = data["frame_height"],
                 frame_width = data["frame_width"],
                 wait_key = data["wait_key"],
-                ord_key = data["ord_key"]
+                ord_key = data["ord_key"],
+                communication_protocol = data["communication_protocol"]
             )
-    
     else:
-        print("\nInvalid input found at data[\"device\"]. Input must be between pc and rp.")
+        handle_invalid_input("data[\"write_points_mode\"]", ["true", "false"], write_points_mode)
+
+def main():
+    """
+    Main entry point for the script.
+    """
+    data = stls.extract_root_data(file_path="src/utils/root_data.txt")
+
+    device = data.get("device", "").lower()
+    if device == "rp":
+        process_rp_device(data)
+    elif device == "pc":
+        process_pc_device(data)
+    else:
+        handle_invalid_input("data[\"device\"]", ["pc", "rp"], device)
+
+if __name__ == "__main__":
+    main()

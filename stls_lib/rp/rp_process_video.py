@@ -1,23 +1,31 @@
 import cv2
 import time
+from picamera2 import Picamera2
 from stls_lib import stls, rtdb
 
-def main(video_source, 
-         weight_file_path: str, 
-         class_list_file_path: str, 
-         zones_file_path: str, 
-         detect_sensitivity: float, 
-         time_interval: float, 
-         frame_name: str, 
-         frame_height: int, 
-         frame_width: int, 
-         wait_key: int, 
+def main(weight_file_path: str,
+         class_list_file_path: str,
+         zones_file_path: str,
+         detect_sensitivity: float,
+         time_interval: float,
+         frame_name: str,
+         frame_height: int,
+         frame_width: int,
+         wait_key: int,
          ord_key: str,
          communication_protocol: str
          ):
+
+    # Initialize camera
+    picam2 = Picamera2()
+    picam2.preview_configuration.main.size = (frame_width, frame_height)
+    picam2.preview_configuration.main.format = "RGB888"
+    picam2.preview_configuration.align()
+    picam2.configure("preview")
+    picam2.start()
+
     
     # Load YOLO model and configurations
-    captured = stls.load_camera(video_source)
     yolo_model = stls.load_model(weight_file_path)
     class_list = stls.load_class_names(class_list_file_path)
     zones, number_of_zones = stls.load_zones(zones_file_path)
@@ -35,10 +43,7 @@ def main(video_source,
     while success:
         start_time = time.time() * 1000
         curr_time = time.time()
-        success, frame = captured.read()
-        
-        if not success:
-            break
+        frame = picam2.capture_array()
 
         count += 1
         if count % 3 != 0:
@@ -54,7 +59,7 @@ def main(video_source,
         for indx in range(number_of_zones):
             queuing_data.append(stls.handle_zone_queuing(indx, collected_vehicle, curr_time, zones_data, time_interval))
             stls.traffic_light_display(frame, indx, is_zone_occupied = len(collected_vehicle[indx]) > 0) # Optional visualization
-
+            
         curr_vehic_zone0 = queuing_data[0]["vehicle"]
         curr_vehic_zone1 = queuing_data[1]["vehicle"]    
         # Only send to Firebase if vehicle data has changed
@@ -73,5 +78,4 @@ def main(video_source,
         stls.display_zone_info(frame, data_to_display)  # Optional visualization       
         success = stls.show_frame(frame, frame_name, wait_key, ord_key)  # Optional frame display
 
-    captured.release()
     cv2.destroyAllWindows()
