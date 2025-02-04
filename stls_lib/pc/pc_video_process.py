@@ -20,7 +20,11 @@ def main(video_source,
     captured = stls.load_camera(video_source)
     yolo_model = stls.load_model(weight_file_path)
     class_list = stls.load_class_names(class_list_file_path)
-    zones, number_of_zones = stls.load_zones(zones_file_path)
+
+    # Extract data from the zones.txt file
+    data = stls.extract_data_from_file(zones_file_path)
+    zones = stls.convert_coordinates(data["zones"], data["frame_width"], data["frame_height"], frame_width, frame_height) # Ensuring the zone coordinates to fit the new frame dimensions
+    number_of_zones = data["number_of_zones"]
 
     # Initalizing the Firebase Real-time Database
     rtdb.initialize_firebase(communication_protocol)
