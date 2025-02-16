@@ -29,6 +29,10 @@ unsigned long sendDataPrevMillis = 0;
 #define LED_BUILTIN 2 
 #define RELAY 4 
 
+// Relay state
+#define ON 1
+#define OFF 0
+
 String stringValue = " ";
 String previous_word = " ";
 
@@ -135,28 +139,28 @@ void evaluateData(String word) {
     // ROTATE SERVO
 
     digitalWrite(LED_BUILTIN, 1);
-    digitalWrite(RELAY, 1);
+    digitalWrite(RELAY, ON);
   } else if (word.equals("bus")) {
     // ROTATE SERVO
 
 
     digitalWrite(LED_BUILTIN, 1);
-    digitalWrite(RELAY, 1);
+    digitalWrite(RELAY, ON);
   } else if (word.equals("truck")) {
     // ROTATE SERVO
     
     
     digitalWrite(LED_BUILTIN, 1);
-    digitalWrite(RELAY, 1);
+    digitalWrite(RELAY, ON);
   } else if (word.equals("motor")) {
     // ROTATE SERVO
     
     
     digitalWrite(LED_BUILTIN, 1);
-    digitalWrite(RELAY, 1);
+    digitalWrite(RELAY, ON);
   } else {
     digitalWrite(LED_BUILTIN, 0);
-    digitalWrite(RELAY, 0);
+    digitalWrite(RELAY, OFF);
   }
 }
 
