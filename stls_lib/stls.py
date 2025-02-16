@@ -122,7 +122,10 @@ def display_zone_info(frame, data, color=(255, 255, 255), font = cv2.FONT_HERSHE
         cv2.rectangle(overlay, (position[0] - 5, position[1] - text_h - 5), (position[0] + text_w + 5, position[1] + 5), bg_color, cv2.FILLED)
 
     text = f"Process Time per frame: {processing_time:.2f} ms"
-    position = (frame_width - 550, 30)
+    if (frame_width > 1000):
+        position = (frame_width - 550, 30)
+    else:
+        position = (25, 25 + 30 * 2)
     (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
     cv2.rectangle(overlay, (position[0] - 5, position[1] - text_h - 5), (position[0] + text_w + 5, position[1] + 5), bg_color, cv2.FILLED)
     cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
