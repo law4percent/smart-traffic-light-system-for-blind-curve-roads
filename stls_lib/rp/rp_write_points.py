@@ -4,6 +4,8 @@ import numpy as np
 
 points = []
 entry_counter = 0
+frame_h = 0
+frame_w = 0
 
 def click_event(event, x, y, flags, param):
     global points
@@ -25,7 +27,7 @@ def redraw_frame(points, image, frame_name):
     cv2.imshow(frame_name, temp_image)
 
 def save_points_to_file(file_path, max_zones):
-    global points, entry_counter
+    global points, entry_counter, frame_h, frame_w
     if entry_counter >= max_zones:
         print(f"Maximum number of zones ({max_zones}) reached. Program will exit.")
         return False
@@ -39,8 +41,8 @@ def save_points_to_file(file_path, max_zones):
         
         if entry_counter == max_zones - 1:  # When the last zone is saved, write the footer
             file.write(f"\nnumber_of_zone: {entry_counter + 1}\n")
-            file.write(f"frame_width: 1280\n")
-            file.write(f"frame_height: 800\n")
+            file.write(f"frame_width: {frame_w}\n")
+            file.write(f"frame_height: {frame_h}\n")
     
     print(f"Entry {entry_counter} saved to '{file_path}'.")
     points = []
@@ -53,7 +55,7 @@ def instruction(frame):
     cv2.putText(frame, f"Press 's' to save, 'c' to close the polygon, 'u' to undo last point, and 'q' to quit.", (25, 30 + 25), cv2.FONT_HERSHEY_SIMPLEX, 0.75, (0, 0, 0), 2)
 
 def main(save_path, frame_height, frame_width, ord_key, max_zones):
-    global points, frame_copy, frame_name
+    global points, frame_copy, frame_name, frame_h, frame_w
 
     picam2 = Picamera2()
     picam2.preview_configuration.main.size = (frame_width, frame_height)
@@ -64,6 +66,9 @@ def main(save_path, frame_height, frame_width, ord_key, max_zones):
 
     frame_name = "Writing Points Mode: RP"
     frame_idx = 0
+
+    frame_h = frame_height
+    frame_w = frame_width
 
     print("Press 'n' to move to the next frame, 's' to save points, 'c' to close the polygon, and 'q' to quit.")
 
